@@ -341,4 +341,74 @@ A **deferred** call is scheduled to run at the end of the surrounding function �
 - Not great for very large files
 
 ---
+## Getting data from APIs
 
+### http.Get in API Fetching
+ 
+http.Get sends a GET request to a URL and returns the server response. The response contains a Body which is a stream — you need to read it with io.ReadAll and close it with defer resp.Body.Close() after you are done. To use it, you must import net/http — this package provides everything related to HTTP requests and responses in Go.
+
+---
+
+### ioutil.ReadAll in API Fetching
+ 
+When you fetch data from an API, the response body is a stream — ioutil.ReadAll reads that entire stream and gives you the raw bytes at once. You then convert it to a string or parse it as JSON to use the data. Just like ReadFile, it is deprecated — use io.ReadAll instead.
+
+---
+## URL Breakdown in Go
+
+### Example URL
+
+https://example.com:8080/products/search?q=laptop&page=2
+
+### Parts of a URL
+
+| Part | Value | What It Means |
+|---|---|---|
+| Scheme | https | The protocol used to communicate |
+| Host | example.com | The server you are talking to |
+| Port | 8080 | The door on the server to connect through |
+| Path | /products/search | The specific resource or page on the server |
+| Query Parameters | q=laptop&page=2 | Extra data sent with the request (key=value pairs) |
+
+### Query Parameters
+
+Query parameters come after the ? sign and are separated by &. In this example there are two parameters — q which is the search keyword and page which is the page number.
+
+### net/url Package
+
+To work with URLs in Go — like parsing, building, or extracting query parameters — you need to import net/url. This package lets you break a URL into its parts and read or modify them easily.
+
+
+## Marshal vs Unmarshal
+
+### Marshal — Struct to JSON
+
+You have data in your code and you want to send it to an API. Marshal converts your Go struct into JSON text so the API can understand it.
+
+Your struct goes in, JSON text comes out.
+
+---
+
+### Unmarshal — JSON to Struct
+
+You got a response from an API and it is raw JSON text. Unmarshal converts that JSON text into a Go struct so your code can work with it.
+
+JSON text goes in, your struct comes out.
+
+---
+
+### Functions
+ 
+| Function | Takes | Returns |
+|---|---|---|
+| json.Marshal | A Go struct or value | Byte slice (JSON text), Error |
+| json.Unmarshal | Byte slice (JSON text) + a pointer to a struct | Error |
+ 
+---
+
+### One Line Summary
+
+| | Direction | Think of it as |
+|---|---|---|
+| Marshal | Struct → JSON | Packing your data to send |
+| Unmarshal | JSON → Struct | Unpacking data you received |#
