@@ -312,3 +312,33 @@ A **deferred** call is scheduled to run at the end of the surrounding function â
 
 ---
 
+## Go File Handling â€” Simple Notes
+
+### What Each Function Does
+
+| Function | What It Does | What It Returns |
+|---|---|---|
+| os.Create | Makes a new file. Wipes it clean if it already exists | File pointer, Error |
+| io.WriteString | Writes text into the file | Bytes written (int), Error |
+| os.Open | Opens an existing file for reading only | File pointer, Error |
+| file.Read | Reads a small chunk of the file at a time into a buffer | Bytes read (int), Error |
+| ioutil.ReadFile | Reads the entire file at once. Deprecated since Go 1.16 | Byte slice, Error |
+| os.ReadFile | Same as ioutil.ReadFile but modern and recommended | Byte slice, Error |
+| file.Close | Closes the file and frees up the resource | Error |
+
+---
+
+### Buffer vs No Buffer
+
+**Using a Buffer (file.Read)**
+- Reads the file piece by piece
+- Uses less memory
+- Good for large files
+
+**Not Using a Buffer (ioutil.ReadFile / os.ReadFile)**
+- Reads everything at once
+- Simple and quick
+- Not great for very large files
+
+---
+
