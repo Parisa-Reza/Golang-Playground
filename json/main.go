@@ -32,7 +32,7 @@ func main() {
 
 	// unmarshalling json to struct
 	var person2 Person
-	err = json.Unmarshal(jsonData, &person2) // here
+	err = json.Unmarshal(jsonData, &person2) // here Unmarshal takes the json data in bytes and a pointer to the struct variable where we want to store the unmarshalled data
 	if err!=nil {
 		fmt.Println("Error converting JSON to struct:", err)
 		return
