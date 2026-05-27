@@ -411,4 +411,101 @@ JSON text goes in, your struct comes out.
 | | Direction | Think of it as |
 |---|---|---|
 | Marshal | Struct → JSON | Packing your data to send |
-| Unmarshal | JSON → Struct | Unpacking data you received |#
+| Unmarshal | JSON → Struct | Unpacking data you received |
+
+---
+
+## Go Concurrency — Simple Notes
+
+---
+
+### Concurrency vs Parallelism
+
+**Concurrency** means dealing with multiple tasks at the same time — but not necessarily running them at the exact same moment. Think of one cook switching between chopping and boiling.
+
+**Parallelism** means actually running multiple tasks at the exact same moment — multiple cores doing work simultaneously. Think of two cooks each doing their own task at the same time.
+
+| | Concurrency | Parallelism |
+|---|---|---|
+| Tasks | Switch between tasks | Run at the same time |
+| Cores needed | One is enough | Needs multiple cores |
+| Think of it as | Juggling | Two people juggling |
+
+---
+
+### Goroutine
+
+A goroutine is a lightweight thread managed by Go. You use the go keyword before a function call to run it concurrently. It is extremely cheap — you can run thousands of them without issues.
+
+- You just write go before any function call
+- It runs in the background while the rest of your code continues
+- If main finishes, all goroutines are killed immediately
+
+---
+
+### The Problem with Goroutines
+
+Since goroutines run in the background, your main function can finish before they are done. You need a way to wait for them — that is where WaitGroup comes in.
+
+---
+
+### sync.WaitGroup
+
+A WaitGroup makes your main function wait until all goroutines are finished. Think of it as a counter.
+
+| Method | What It Does |
+|---|---|
+| Add(n) | Says "I am starting n goroutines, wait for them" |
+| Done() | Says "one goroutine is finished" — call this inside each goroutine |
+| Wait() | Blocks and waits until the counter reaches zero |
+
+Always call defer wg.Done() at the start of your goroutine so it always runs even if something goes wrong.
+
+---
+
+### Channel
+
+A channel is a pipe that lets goroutines talk to each other and pass data safely. One goroutine sends a value in, another receives it out.
+
+- Use make(chan type) to create a channel
+- Send a value with ch <- value
+- Receive a value with value := <- ch
+- Channels are blocking — the sender waits until someone receives and vice versa
+
+| | What It Does |
+|---|---|
+| ch <- value | Send value into the channel |
+| value := <-ch | Receive value from the channel |
+| close(ch) | Close the channel when done sending |
+
+---
+
+## Buffered vs Unbuffered Channel
+
+**Unbuffered** — sender blocks until receiver is ready. They must meet at the same time.
+
+**Buffered** — has a capacity. Sender can drop values in without waiting as long as the buffer is not full.
+
+---
+
+### When to Use What
+
+| Tool | Use When |
+|---|---|
+| Goroutine | You want to run something in the background |
+| WaitGroup | You want to wait for multiple goroutines to finish |
+| Channel | Goroutines need to pass data or signal each other |
+
+---
+
+### The Simple Flow
+
+```
+main starts
+  → launches goroutines with go
+  → WaitGroup tracks them
+  → goroutines do their work
+  → pass results through channels if needed
+  → WaitGroup.Wait() holds main until all are done
+main exits
+```
